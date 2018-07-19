@@ -34,7 +34,7 @@ function bamazon() {
             message: "How many would you like to buy?",
             validate: function (quantity) {
                 var reg = /^\d+$/;
-                return reg.test(quantity) || "Please enter a number!";
+                return reg.test(quantity) || "Please enter a whole number!";
             }
         }]).then(function (userChoice) {
             let chosenItem;

@@ -69,7 +69,7 @@ function bamazon() {
                     message: "How much would you like to add?",
                     validate: function (quantity) {
                         var reg = /^\d+$/;
-                        return reg.test(quantity) || "Please enter a number!";
+                        return reg.test(quantity) || "Please enter a whole number!";
                     }
                 }]).then(function (userChoice) {
                     let chosenItem;
@@ -116,7 +116,7 @@ function bamazon() {
                 message: "What is the retail price of the product(Enter price as a whole number where the last two numbers are the decimal. For example, 300 will equal $3.00)?",
                 validate: function (quantity) {
                     var reg = /^\d+$/;
-                    return reg.test(quantity) || "Please enter a number!"
+                    return reg.test(quantity) || "Please enter a whole number!"
                 }
             },
             {
@@ -125,7 +125,7 @@ function bamazon() {
                 message: "How much inventory would you like to add?",
                 validate: function (quantity) {
                     var reg = /^\d+$/;
-                    return reg.test(quantity) || "Please enter a number!"
+                    return reg.test(quantity) || "Please enter a whole number!"
                 }
             }]).then(function (response) {
                 function insertDecimal(num) {
