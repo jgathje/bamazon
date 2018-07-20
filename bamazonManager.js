@@ -1,4 +1,5 @@
 let mysql = require("mysql");
+let cTable = require('console.table')
 let inquirer = require("inquirer");
 let connection = mysql.createConnection({
     host: "localhost",
@@ -23,28 +24,20 @@ function bamazon() {
         if (response.choice === "View Products for Sale") {
             connection.query("SELECT * FROM products", function (err, response) {
                 if (err) throw err;
-                for (let i = 0; i < response.length; i++) {
-                    console.log("Product ID: " + response[i].item_id)
-                    console.log("Product Name: " + response[i].product_name)
-                    console.log("Product Department: " + response[i].department_name)
-                    console.log("Product Price: $" + response[i].price)
-                    console.log("Product Stock Quantity: " + response[i].stock_quantity + "\n")
-                }
+                console.table(response)
                 endBam();
             });
         }
         else if (response.choice === "View Low Inventory") {
             connection.query("SELECT * FROM products", function (err, response) {
                 if (err) throw err;
+                let productArr = []
                 for (let i = 0; i < response.length; i++) {
                     if (response[i].stock_quantity <= 5) {
-                        console.log("Product ID: " + response[i].item_id)
-                        console.log("Product Name: " + response[i].product_name)
-                        console.log("Product Department: " + response[i].department_name)
-                        console.log("Product Price: $" + response[i].price)
-                        console.log("Product Stock Quantity: " + response[i].stock_quantity + "\n")
+                        productArr.push(response[i])
                     }
                 }
+                console.table(productArr)
                 endBam();
             })
         }
@@ -99,6 +92,13 @@ function bamazon() {
             })
         }
         else if (response.choice === "Add New Product") {
+            let deptArr = []
+            connection.query("SELECT * FROM departments", function(err,response){
+                if (err) throw err;
+                for (let i=0; i < response.length; i++){
+                    deptArr.push(response[i].department_names)
+                }
+            })
             inquirer.prompt([{
                 name: "product_name",
                 type: "input",
@@ -106,16 +106,17 @@ function bamazon() {
             },
             {
                 name: "department_name",
-                type: "input",
+                type: "list",
+                choices: deptArr,
                 message: "In which department does the product belong?"
 
             },
             {
                 name: "price",
                 type: "input",
-                message: "What is the retail price of the product(Enter price as a whole number where the last two numbers are the decimal. For example, 300 will equal $3.00)?",
+                message: "What is the retail price of the product?",
                 validate: function (quantity) {
-                    var reg = /^\d+$/;
+                    var reg = /^\d+(\.\d\d)?$/;
                     return reg.test(quantity) || "Please enter a whole number!"
                 }
             },
@@ -128,24 +129,20 @@ function bamazon() {
                     return reg.test(quantity) || "Please enter a whole number!"
                 }
             }]).then(function (response) {
-                function insertDecimal(num) {
-                    return (num / 100).toFixed(2);
-                }
-                let price = insertDecimal(response.price)
                 connection.query(
                     "INSERT INTO products SET ?",
                     [
                         {
                             product_name: response.product_name,
                             department_name: response.department_name,
-                            price: price,
+                            price: response.price,
                             stock_quantity: response.quantity
                         }
                     ],
                     function (err) {
                         if (err) throw err;
                         console.log("\nYou have succesfully added " + response.quantity + " " + response.product_name + " to your inventory!")
-                        console.log("You can find it in the " + response.department_name + " section for $" + price + ".\n")
+                        console.log("You can find it in the " + response.department_name + " section for $" + response.price + ".\n")
                         endBam();
                     })
             })

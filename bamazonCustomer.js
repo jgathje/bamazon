@@ -48,15 +48,17 @@ function bamazon() {
                     else {
                         let updateStock = parseInt(chosenItem.stock_quantity - userChoice.quantity)
                         let orderTotal = (userChoice.quantity * chosenItem.price)
+                        let productSales = orderTotal + chosenItem.product_sales
                         connection.query(
                             "UPDATE products SET ? WHERE ?",
                             [
                                 {
-                                    stock_quantity: updateStock
+                                    stock_quantity: updateStock,
+                                    product_sales: productSales
                                 },
                                 {
                                     item_id: chosenItem.item_id
-                                }
+                                },
                             ],
                             function (error) {
                                 if (error) throw err;
